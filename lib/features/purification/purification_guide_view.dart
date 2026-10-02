@@ -3,7 +3,12 @@ import 'widgets/step_item_card.dart';
 import 'widgets/water_status_card.dart';
 
 class PurificationGuideView extends StatefulWidget {
-  const PurificationGuideView({super.key});
+  final VoidCallback?
+      onFinish; // Callback pour avertir le parent (ex: retour à l'onglet Analyse)
+  const PurificationGuideView({
+    super.key,
+    this.onFinish,
+  });
 
   @override
   State<PurificationGuideView> createState() => _PurificationGuideViewState();
@@ -148,8 +153,13 @@ class _PurificationGuideViewState extends State<PurificationGuideView> {
                   ),
                   onPressed: () {
                     setState(() {
-                      _showSteps = false; // Retour à la carte de diagnostic
+                      _showSteps =
+                          false; // Retour à la carte de diagnostic, Réinitialise l'état interne
                     });
+                    // Si le parent a fourni une action de redirection, on l'exécute !
+                    if (widget.onFinish != null) {
+                      widget.onFinish!();
+                    }
                   },
                   child: const Text(
                     'Terminer / Nouvel essai',

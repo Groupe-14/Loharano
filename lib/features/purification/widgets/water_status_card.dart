@@ -23,25 +23,29 @@ class WaterStatusCard extends StatelessWidget {
     final IconData icon;
     final String title;
     final String subtitle;
+    final String buttonText;
 
     switch (status) {
       case WaterStatus.contaminated:
-        backgroundColor = const Color(0xFFD32F2F); // Rouge
+        backgroundColor = const Color(0xFFD32F2F);
         icon = Icons.warning_amber_rounded;
         title = 'Danger — Contaminée';
         subtitle = 'Ne buvez pas. Faites bouillir.';
+        buttonText = 'Voir les solutions';
         break;
       case WaterStatus.turbid:
-        backgroundColor = const Color(0xFFE68A00); // Orange
+        backgroundColor = const Color(0xFFE68A00);
         icon = Icons.warning_amber_rounded;
         title = 'Eau Trouble — Filtrer';
         subtitle = 'Filtrez avant de boire.';
+        buttonText = 'Voir la méthode de filtration';
         break;
       case WaterStatus.safe:
-        backgroundColor = const Color(0xFF008744); // Vert
+        backgroundColor = const Color(0xFF008744);
         icon = Icons.check_circle_outline;
         title = 'Eau Saine';
         subtitle = 'Vous pouvez boire cette eau.';
+        buttonText = 'Conseils de conservation';
         break;
     }
 
@@ -93,9 +97,9 @@ class WaterStatusCard extends StatelessWidget {
                 ),
               ),
               onPressed: onSeeSolutions,
-              child: const Text(
-                'Voir les solutions',
-                style: TextStyle(
+              child: Text(
+                buttonText,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                 ),
