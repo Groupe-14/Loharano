@@ -16,7 +16,7 @@ class PurificationGuideView extends StatefulWidget {
 
 class _PurificationGuideViewState extends State<PurificationGuideView> {
   // Mock du résultat de l'IA (par défaut sur Eau Trouble pour tester)
-  WaterStatus _currentStatus = WaterStatus.turbid;
+  WaterStatus _currentStatus = WaterStatus.safe;
 
   // Bascule entre la carte de diagnostic et la liste des consignes
   bool _showSteps = false;
@@ -99,8 +99,7 @@ class _PurificationGuideViewState extends State<PurificationGuideView> {
     final steps = _getStepsForStatus();
 
     return Scaffold(
-      backgroundColor:
-          const Color(0xFFE8F5E9), // Fond bleu/vert très clair de la maquette
+      backgroundColor: const Color(0xFFE8F5E9),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

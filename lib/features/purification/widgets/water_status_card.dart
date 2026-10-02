@@ -83,6 +83,21 @@ class WaterStatusCard extends StatelessWidget {
               color: Colors.white70,
             ),
           ),
+          const SizedBox(height: 16),
+          // Bouton Audio
+          Container(
+            decoration: const BoxDecoration(
+              color: Colors.white24,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.volume_up_rounded,
+                  color: Colors.white, size: 28),
+              onPressed: () {
+                // Action pour la lecture vocale
+              },
+            ),
+          ),
           const Spacer(),
           // Bouton "Voir les solutions"
           SizedBox(
