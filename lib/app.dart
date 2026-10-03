@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'core/constants/app_colors.dart';
-import 'features/audio_qr/qr_scanner_view.dart';
+import 'features/audio_qr/presentation/qr_scanner_view.dart';
 import 'features/camera_ai/camera_ai_view.dart';
 import 'features/local_db/test_history_view.dart';
 import 'features/purification/purification_guide_view.dart';
