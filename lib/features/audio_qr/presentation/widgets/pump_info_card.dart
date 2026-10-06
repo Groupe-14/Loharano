@@ -39,7 +39,8 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
           ),
           child: Card(
             elevation: 8,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.all(10),
               child: SingleChildScrollView(
@@ -52,7 +53,8 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
                         const CircleAvatar(
                           radius: 16,
                           backgroundColor: Colors.blueAccent,
-                          child: Icon(Icons.water_drop, color: Colors.white, size: 18),
+                          child: Icon(Icons.water_drop,
+                              color: Colors.white, size: 18),
                         ),
                         const SizedBox(width: 8),
                         Expanded(
@@ -70,7 +72,8 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
                               ),
                               Text(
                                 '${widget.pump.name} • ${widget.pump.status}',
-                                style: const TextStyle(fontSize: 11, color: Colors.black54),
+                                style: const TextStyle(
+                                    fontSize: 11, color: Colors.black54),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -80,9 +83,12 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
                         IconButton(
                           constraints: const BoxConstraints(),
                           padding: const EdgeInsets.all(4),
-                          icon: Icon(_isExpanded ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up),
+                          icon: Icon(_isExpanded
+                              ? Icons.keyboard_arrow_down
+                              : Icons.keyboard_arrow_up),
                           tooltip: _isExpanded ? 'Réduire' : 'Déplier',
-                          onPressed: () => setState(() => _isExpanded = !_isExpanded),
+                          onPressed: () =>
+                              setState(() => _isExpanded = !_isExpanded),
                         ),
                         IconButton(
                           constraints: const BoxConstraints(),
@@ -93,7 +99,6 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
                         ),
                       ],
                     ),
-
                     if (_isExpanded) ...[
                       const Divider(height: 12),
                       AudioControlsWidget(audioEngine: widget.audioEngine),

@@ -1,127 +1,81 @@
 import 'package:flutter/material.dart';
 
-enum WaterStatus {
-  contaminated,
-  turbid,
-  safe,
-}
+import '../../../core/constants/app_colors.dart';
+import '../../../core/models/risk_level.dart';
 
 class WaterStatusCard extends StatelessWidget {
-  final WaterStatus status;
-  final VoidCallback onSeeSolutions;
+  const WaterStatusCard(
+      {super.key, required this.level, required this.onSeeSteps, this.onSpeak});
 
-  const WaterStatusCard({
-    super.key,
-    required this.status,
-    required this.onSeeSolutions,
-  });
+  final RiskLevel level;
+  final VoidCallback onSeeSteps;
+  final VoidCallback? onSpeak;
 
   @override
   Widget build(BuildContext context) {
-    // Configuration selon l'état de l'eau
-    final Color backgroundColor;
-    final IconData icon;
-    final String title;
-    final String subtitle;
-    final String buttonText;
+    final background = switch (level) {
+      RiskLevel.low => AppColors.low,
+      RiskLevel.medium => AppColors.medium,
+      RiskLevel.high => AppColors.high,
+      RiskLevel.unknown => AppColors.unknown,
+    };
+    final icon = switch (level) {
+      RiskLevel.low => Icons.info_outline,
+      RiskLevel.medium => Icons.warning_amber_rounded,
+      RiskLevel.high => Icons.report_outlined,
+      RiskLevel.unknown => Icons.help_outline,
+    };
+    final subtitle = switch (level) {
+      RiskLevel.low =>
+        'Ce n’est pas une garantie. En cas de doute, faites bouillir.',
+      RiskLevel.medium => 'Traitez l’eau avant de la boire.',
+      RiskLevel.high => 'Ne buvez pas cette eau sans traitement.',
+      RiskLevel.unknown => 'Le dépistage ne permet pas de conclure.',
+    };
 
-    switch (status) {
-      case WaterStatus.contaminated:
-        backgroundColor = const Color(0xFFD32F2F);
-        icon = Icons.warning_amber_rounded;
-        title = 'Danger — Contaminée';
-        subtitle = 'Ne buvez pas. Faites bouillir.';
-        buttonText = 'Voir les solutions';
-        break;
-      case WaterStatus.turbid:
-        backgroundColor = const Color(0xFFE68A00);
-        icon = Icons.warning_amber_rounded;
-        title = 'Eau Trouble — Filtrer';
-        subtitle = 'Filtrez avant de boire.';
-        buttonText = 'Voir la méthode de filtration';
-        break;
-      case WaterStatus.safe:
-        backgroundColor = const Color(0xFF008744);
-        icon = Icons.check_circle_outline;
-        title = 'Eau Saine';
-        subtitle = 'Vous pouvez boire cette eau.';
-        buttonText = 'Conseils de conservation';
-        break;
-    }
-
-    return Container(
-      color: backgroundColor,
-      padding: const EdgeInsets.all(24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Spacer(),
-          // Icône centrale
-          Icon(
-            icon,
-            size: 96,
-            color: Colors.white,
-          ),
-          const SizedBox(height: 24),
-          // Titre
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-          const SizedBox(height: 12),
-          // Sous-titre
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 18,
-              color: Colors.white70,
-            ),
-          ),
-          const SizedBox(height: 16),
-          // Bouton Audio
-          Container(
-            decoration: const BoxDecoration(
-              color: Colors.white24,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
+    return ColoredBox(
+      color: background,
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Spacer(),
+            Icon(icon, size: 96, color: Colors.white),
+            const SizedBox(height: 24),
+            Text(level.label,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
+            const SizedBox(height: 12),
+            Text(subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 18, color: Colors.white)),
+            const SizedBox(height: 16),
+            IconButton(
+              style: IconButton.styleFrom(backgroundColor: Colors.white24),
+              onPressed: onSpeak,
               icon: const Icon(Icons.volume_up_rounded,
                   color: Colors.white, size: 28),
-              onPressed: () {
-                // Action pour la lecture vocale
-              },
+              tooltip: 'Écouter le résultat',
             ),
-          ),
-          const Spacer(),
-          // Bouton "Voir les solutions"
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF0066CC), // Bleu maquette
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(28),
-                ),
-              ),
-              onPressed: onSeeSolutions,
-              child: Text(
-                buttonText,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: 54,
+              child: FilledButton(
+                style: FilledButton.styleFrom(
+                    backgroundColor: AppColors.primaryBlue),
+                onPressed: onSeeSteps,
+                child: const Text('Voir les actions',
+                    style:
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

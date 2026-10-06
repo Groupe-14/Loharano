@@ -22,13 +22,17 @@ class AudioControlsWidget extends StatelessWidget {
     final isPlaying = audioEngine.isPlaying;
     final position = audioEngine.position;
     final duration = audioEngine.duration;
-    final maxSeconds = duration.inSeconds > 0 ? duration.inSeconds.toDouble() : 1.0;
+    final maxSeconds =
+        duration.inSeconds > 0 ? duration.inSeconds.toDouble() : 1.0;
     final currentSeconds = position.inSeconds.toDouble().clamp(0.0, maxSeconds);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.5),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -40,15 +44,18 @@ class AudioControlsWidget extends StatelessWidget {
                 width: 36,
                 child: Text(
                   _formatDuration(position),
-                  style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 11, fontWeight: FontWeight.bold),
                 ),
               ),
               Expanded(
                 child: SliderTheme(
                   data: SliderTheme.of(context).copyWith(
                     trackHeight: 3,
-                    thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
-                    overlayShape: const RoundSliderOverlayShape(overlayRadius: 12),
+                    thumbShape:
+                        const RoundSliderThumbShape(enabledThumbRadius: 6),
+                    overlayShape:
+                        const RoundSliderOverlayShape(overlayRadius: 12),
                   ),
                   child: Slider(
                     value: currentSeconds,
@@ -87,15 +94,19 @@ class AudioControlsWidget extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: Semantics(
-                    label: isPlaying ? 'Mettre en pause' : 'Lancer l\'instruction audio',
+                    label: isPlaying
+                        ? 'Mettre en pause'
+                        : 'Lancer l\'instruction audio',
                     button: true,
                     child: FilledButton.icon(
                       style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 8),
                         visualDensity: VisualDensity.compact,
                       ),
                       onPressed: () => audioEngine.togglePlayPause(),
-                      icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow, size: 20),
+                      icon: Icon(isPlaying ? Icons.pause : Icons.play_arrow,
+                          size: 20),
                       label: Text(
                         isPlaying ? 'Pause' : 'Écouter',
                         maxLines: 1,
@@ -113,7 +124,8 @@ class AudioControlsWidget extends StatelessWidget {
                   tooltip: 'Vitesse de lecture',
                   padding: EdgeInsets.zero,
                   icon: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey.shade400),
                       borderRadius: BorderRadius.circular(6),
@@ -125,7 +137,8 @@ class AudioControlsWidget extends StatelessWidget {
                         const SizedBox(width: 2),
                         Text(
                           '${audioEngine.playbackRate}x',
-                          style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 11, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -144,7 +157,8 @@ class AudioControlsWidget extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               audioEngine.errorMessage!,
-              style: TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.error),
+              style: TextStyle(
+                  fontSize: 11, color: Theme.of(context).colorScheme.error),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),

@@ -2,8 +2,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 
-/// Service de gestion du moteur audio pour la lecture hors-ligne,
-/// la compatibilité Web Audio API / HTML5 et la synchronisation des étapes.
+/// Lecteur d'un fichier audio déjà embarqué dans l'application.
 class AudioEngineService {
   AudioEngineService() {
     _initAudioEngine();
@@ -34,24 +33,6 @@ class AudioEngineService {
   String? get errorMessage => _errorMessage;
 
   void _initAudioEngine() {
-    // Configuration optimisée pour le Web et le mobile hors-ligne
-    if (kIsWeb) {
-      _player.setAudioContext(
-        AudioContext(
-          iOS: AudioContextIOS(
-            category: AVAudioSessionCategory.playback,
-            options: const {AVAudioSessionOptions.mixWithOthers},
-          ),
-          android: const AudioContextAndroid(
-            stayAwake: true,
-            contentType: AndroidContentType.speech,
-            usageType: AndroidUsageType.assistanceAccessibility,
-            audioFocus: AndroidAudioFocus.gainTransientMayDuck,
-          ),
-        ),
-      );
-    }
-
     _stateSubscription = _player.onPlayerStateChanged.listen((state) {
       _playerState = state;
       onStateChanged?.call();
@@ -77,7 +58,7 @@ class AudioEngineService {
       await _player.setPlaybackRate(_playbackRate);
       await _player.play(AssetSource(assetPath));
     } catch (e) {
-      _errorMessage = 'Lecture audio indisponible hors-ligne';
+      _errorMessage = 'Fichier audio manquant';
       onStateChanged?.call();
       debugPrint('Erreur Moteur Audio: $e');
     }

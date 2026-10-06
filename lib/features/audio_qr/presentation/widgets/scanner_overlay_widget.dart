@@ -29,7 +29,8 @@ class ScannerOverlayWidget extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: (isDetected ? Colors.greenAccent : Colors.black).withValues(alpha: 0.3),
+                  color: (isDetected ? Colors.greenAccent : Colors.black)
+                      .withValues(alpha: 0.3),
                   blurRadius: 12,
                   spreadRadius: 2,
                 ),
@@ -39,8 +40,11 @@ class ScannerOverlayWidget extends StatelessWidget {
               children: [
                 Center(
                   child: Icon(
-                    isDetected ? Icons.check_circle_outline : Icons.qr_code_scanner,
-                    color: (isDetected ? Colors.greenAccent : Colors.white).withValues(alpha: 0.5),
+                    isDetected
+                        ? Icons.check_circle_outline
+                        : Icons.qr_code_scanner,
+                    color: (isDetected ? Colors.greenAccent : Colors.white)
+                        .withValues(alpha: 0.5),
                     size: 64,
                   ),
                 ),
@@ -53,7 +57,8 @@ class ScannerOverlayWidget extends StatelessWidget {
           right: 16,
           child: Card(
             color: Colors.black54,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               child: Row(
@@ -89,11 +94,15 @@ class ScannerOverlayWidget extends StatelessWidget {
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.center_focus_strong, color: Colors.white, size: 16),
+                  Icon(Icons.center_focus_strong,
+                      color: Colors.white, size: 16),
                   SizedBox(width: 6),
                   Text(
                     'Pointez vers le QR Code',
-                    style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w500),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500),
                   ),
                 ],
               ),

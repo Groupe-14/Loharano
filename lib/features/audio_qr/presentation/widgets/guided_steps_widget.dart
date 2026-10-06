@@ -57,7 +57,8 @@ class GuidedStepsWidget extends StatelessWidget {
 
             return Semantics(
               selected: isActive,
-              label: 'Étape ${step.stepNumber}: ${step.title}. ${step.description}',
+              label:
+                  'Étape ${step.stepNumber}: ${step.title}. ${step.description}',
               child: InkWell(
                 onTap: () => audioEngine.seek(step.startTime),
                 borderRadius: BorderRadius.circular(10),
@@ -66,7 +67,10 @@ class GuidedStepsWidget extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? Theme.of(context).colorScheme.primary.withValues(alpha: 0.12)
+                        ? Theme.of(context)
+                            .colorScheme
+                            .primary
+                            .withValues(alpha: 0.12)
                         : Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
@@ -97,7 +101,9 @@ class GuidedStepsWidget extends StatelessWidget {
                             Text(
                               '${step.stepNumber}. ${step.title}',
                               style: TextStyle(
-                                fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
+                                fontWeight: isActive
+                                    ? FontWeight.bold
+                                    : FontWeight.w600,
                                 fontSize: 13,
                                 color: isActive
                                     ? Theme.of(context).colorScheme.primary
@@ -109,7 +115,8 @@ class GuidedStepsWidget extends StatelessWidget {
                               step.description,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isActive ? Colors.black87 : Colors.black54,
+                                color:
+                                    isActive ? Colors.black87 : Colors.black54,
                               ),
                             ),
                           ],
