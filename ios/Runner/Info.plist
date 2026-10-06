@@ -2,6 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Loharano utilise la caméra pour lire un QR de point d’eau et photographier la marque sous le gobelet.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Loharano enregistre la position du dépistage, arrondie à environ 100 mètres sauf si vous demandez la position précise.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
