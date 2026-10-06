@@ -24,3 +24,14 @@ plugins {
 }
 
 include(":app")
+
+gradle.beforeProject {
+    val target = this
+    if (target.name != "camera_android_camerax") return@beforeProject
+    target.pluginManager.withPlugin("com.android.library") {
+        target.dependencies.add(
+            "implementation",
+            "androidx.concurrent:concurrent-futures:1.2.0",
+        )
+    }
+}

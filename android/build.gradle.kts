@@ -19,19 +19,6 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
-// camera-core 1.5.3 only exposes concurrent-futures at runtime. Gradle 9
-// then fails javac on SurfaceRequest. Add it once the plugin is configured.
-subprojects {
-    afterEvaluate {
-        if (name == "camera_android_camerax") {
-            dependencies.add(
-                "implementation",
-                "androidx.concurrent:concurrent-futures:1.2.0",
-            )
-        }
-    }
-}
-
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }
