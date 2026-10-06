@@ -5,7 +5,6 @@ import 'package:http/http.dart' as http;
 import '../../core/db/local_database.dart';
 import '../../core/models/measurement.dart';
 
-/// Envoi optionnel vers Supabase (offre gratuite). Sans les deux clés, rien n'est contacté.
 class SyncService {
   SyncService({http.Client? client, LocalDatabase? database})
       : _client = client ?? http.Client(),

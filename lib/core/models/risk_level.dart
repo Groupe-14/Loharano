@@ -1,4 +1,3 @@
-/// Dépistage, pas une certification. Aucune valeur ne signifie « potable ».
 enum RiskLevel {
   low,
   medium,
@@ -6,9 +5,7 @@ enum RiskLevel {
   unknown;
 
   static RiskLevel parse(String raw) => RiskLevel.values.byName(raw);
-}
 
-extension RiskLevelText on RiskLevel {
   String get label => switch (this) {
         RiskLevel.low => 'Risque faible (non garanti)',
         RiskLevel.medium => 'Risque moyen',
@@ -37,9 +34,7 @@ enum SourceType {
 
   static SourceType parse(String? raw) =>
       raw == null ? SourceType.unknown : SourceType.values.byName(raw);
-}
 
-extension SourceTypeText on SourceType {
   String get label => switch (this) {
         SourceType.pump => 'Pompe',
         SourceType.well => 'Puits',
@@ -51,6 +46,8 @@ extension SourceTypeText on SourceType {
         SourceType.other => 'Autre',
         SourceType.unknown => 'Je ne sais pas',
       };
+
+  bool get isSurface => this == SourceType.river || this == SourceType.lake;
 }
 
 enum GuideAction {
@@ -63,9 +60,7 @@ enum GuideAction {
   otherSource;
 
   static GuideAction parse(String raw) => GuideAction.values.byName(raw);
-}
 
-extension GuideActionText on GuideAction {
   String get title => switch (this) {
         GuideAction.filter => 'Filtrer',
         GuideAction.boil => 'Faire bouillir',

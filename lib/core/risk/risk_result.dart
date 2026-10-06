@@ -14,6 +14,4 @@ class RiskResult {
   final List<String> reasons;
   final List<GuideAction> actions;
   final String testType;
-
-  bool get isDemo => false;
 }

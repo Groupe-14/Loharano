@@ -3,8 +3,6 @@ import 'dart:typed_data';
 
 import 'package:image/image.dart' as img;
 
-/// Heuristique de cadrage, pas un seuil sanitaire.
-/// Une marque noire sous un gobelet clair reste plus sombre que le pourtour.
 class MarkRead {
   const MarkRead(
       {required this.sharpEnough,

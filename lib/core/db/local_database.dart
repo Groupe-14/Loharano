@@ -86,35 +86,10 @@ class LocalDatabase {
         where: 'id = ?', whereArgs: [id]);
   }
 
-  Future<List<WaterPoint>> getWaterPoints() async {
-    final rows = await (await database)
-        .query('water_points', orderBy: 'name COLLATE NOCASE');
-    return rows.map(WaterPoint.fromMap).toList();
-  }
-
-  Future<WaterPoint?> findWaterPoint(String id) async {
-    final rows = await (await database)
-        .query('water_points', where: 'id = ?', whereArgs: [id], limit: 1);
-    if (rows.isEmpty) return null;
-    return WaterPoint.fromMap(rows.first);
-  }
-
   Future<void> insertWaterPoint(WaterPoint point) async {
     await (await database).insert('water_points', point.toMap(),
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
-
-  /// Anciennes lignes v1 (statut safe/warning/danger) : conservées à part, jamais relues comme des mesures.
-  Future<int> legacyRowCount() async {
-    final database = await this.database;
-    final tables = await database.rawQuery(
-        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'water_tests'");
-    if (tables.isEmpty) return 0;
-    final count = Sqflite.firstIntValue(
-        await database.rawQuery('SELECT COUNT(*) FROM water_tests'));
-    return count ?? 0;
-  }
 }
 
-/// Arrondit une coordonnée à environ 100 m (3 décimales).
 double approx100m(double value) => (value * 1000).round() / 1000;
