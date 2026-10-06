@@ -6,9 +6,11 @@ L’application ne dit pas qu’une eau est potable. Elle estime un risque à pa
 
 ## Hors ligne
 
-Le questionnaire, le guide, la voix du téléphone, l’historique et les points enregistrés fonctionnent sans réseau. La base est SQLite, sur l’appareil.
+Le questionnaire, le guide, la voix du téléphone, l’historique et les points enregistrés fonctionnent sans réseau. La base est SQLite, sur l’appareil. Le bandeau en haut indique « Hors ligne » ou « Réseau » selon la connexion détectée.
 
-Le fond de carte OpenStreetMap a besoin d’un passage en ligne la première fois. Les mesures déjà enregistrées restent lisibles dans l’historique même si le fond de carte manque.
+Le fond de carte OpenStreetMap a besoin d’un passage en ligne la première fois. Les tuiles déjà affichées sont gardées sur le téléphone. Les mesures restent lisibles dans l’historique même si le fond manque.
+
+`flutter build web` produit le service worker qui met en cache les fichiers de la version web. Le manifeste d’installation est `web/manifest.json` : application autonome, orientation portrait.
 
 ## Synchro
 
