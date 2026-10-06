@@ -1,5 +1,9 @@
+import 'dart:async';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
+
+import '../../core/constants/app_colors.dart';
 
 class OfflineBadgeWidget extends StatefulWidget {
   const OfflineBadgeWidget({super.key});
@@ -10,16 +14,23 @@ class OfflineBadgeWidget extends StatefulWidget {
 
 class _OfflineBadgeWidgetState extends State<OfflineBadgeWidget> {
   final _connectivity = Connectivity();
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
   bool? _offline;
 
   @override
   void initState() {
     super.initState();
     _read();
-    _connectivity.onConnectivityChanged.listen((results) {
+    _subscription = _connectivity.onConnectivityChanged.listen((results) {
       if (!mounted) return;
       setState(() => _offline = _isOffline(results));
     });
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   Future<void> _read() async {
@@ -39,15 +50,23 @@ class _OfflineBadgeWidgetState extends State<OfflineBadgeWidget> {
         ? 'Réseau…'
         : offline
             ? 'Hors ligne'
-            : 'Réseau détecté';
+            : 'Réseau';
     final color = offline == null
-        ? Colors.grey
+        ? AppColors.muted
         : offline
-            ? Colors.red
-            : Colors.green;
-    return Chip(
-      avatar: Icon(Icons.circle, size: 10, color: color),
-      label: Text(label),
+            ? AppColors.high
+            : AppColors.low;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: const TextStyle(fontSize: 13, color: AppColors.ink)),
+      ],
     );
   }
 }

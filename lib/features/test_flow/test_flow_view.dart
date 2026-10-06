@@ -14,10 +14,10 @@ import '../../core/risk/risk_result.dart';
 import 'mark_photo.dart';
 
 class TestFlowView extends StatefulWidget {
-  const TestFlowView({super.key, required this.onSaved, this.onSpeak});
+  const TestFlowView({super.key, required this.onSaved, this.onOpenGuide});
 
   final Future<void> Function(Measurement measurement) onSaved;
-  final Future<void> Function(String text)? onSpeak;
+  final ValueChanged<RiskResult>? onOpenGuide;
 
   @override
   State<TestFlowView> createState() => _TestFlowViewState();
@@ -70,8 +70,9 @@ class _TestFlowViewState extends State<TestFlowView> {
     var precision = 'approx_100m';
     try {
       var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied)
+      if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+      }
       if (permission == LocationPermission.always ||
           permission == LocationPermission.whileInUse) {
         final position = await Geolocator.getCurrentPosition();
@@ -106,8 +107,7 @@ class _TestFlowViewState extends State<TestFlowView> {
     if (!mounted) return;
     setState(() {
       _saving = false;
-      _saveMessage =
-          'Enregistré sur ce téléphone. Rien n’est envoyé tant que Supabase n’est pas configuré.';
+      _saveMessage = 'Enregistré sur ce téléphone.';
     });
   }
 
@@ -116,82 +116,110 @@ class _TestFlowViewState extends State<TestFlowView> {
     if (_result != null && _step > _questions) return _resultPage();
     if (_step == _questions) return _photoPage();
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       children: [
-        Text('Dépistage ${_step + 1}/$_questions',
-            style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 8),
-        const Text(
-            'Ceci guide le traitement. Ce n’est pas un certificat de potabilité.'),
+        _progress(),
         const SizedBox(height: 20),
-        ..._question,
+        ..._questionWidgets(),
       ],
     );
   }
 
-  List<Widget> get _question => switch (_step) {
+  Widget _progress() {
+    return Row(
+      children: [
+        for (var i = 0; i < _questions; i++)
+          Expanded(
+            child: Container(
+              height: 3,
+              margin: EdgeInsets.only(right: i == _questions - 1 ? 0 : 6),
+              color: i <= _step ? AppColors.teal : AppColors.line,
+            ),
+          ),
+      ],
+    );
+  }
+
+  List<Widget> _questionWidgets() => switch (_step) {
         0 => [
             _prompt('D’où vient l’eau ?'),
+            Text(
+                'Ceci guide le traitement. Ce n’est pas un certificat de potabilité.',
+                style: Theme.of(context).textTheme.bodySmall),
+            const SizedBox(height: 16),
             ...SourceType.values.map(_sourceButton)
           ],
-        1 => _yesNo(
-            'L’eau est-elle trouble ?', _turbid, (value) => _turbid = value),
-        2 => _yesNo('Une odeur anormale ?', _smell, (value) => _smell = value),
-        3 => _yesNo(
-            'A-t-il plu dans les 48 heures ?', _rain, (value) => _rain = value),
-        4 => _yesNo('Une latrine ou des animaux sont-ils proches ?', _latrine,
+        1 => _yesNo('L’eau est-elle trouble ?', (value) => _turbid = value),
+        2 => _yesNo('Une odeur anormale ?', (value) => _smell = value),
+        3 =>
+          _yesNo('A-t-il plu dans les 48 heures ?', (value) => _rain = value),
+        4 => _yesNo('Une latrine ou des animaux sont-ils proches ?',
             (value) => _latrine = value),
-        _ => _yesNo('Le récipient est-il propre ?', _cleanContainer,
-            (value) => _cleanContainer = value),
+        _ => _yesNo(
+            'Le récipient est-il propre ?', (value) => _cleanContainer = value),
       };
 
   Widget _prompt(String text) => Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Text(text,
-          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)));
+        padding: const EdgeInsets.only(bottom: 16),
+        child: Text(text, style: Theme.of(context).textTheme.titleLarge),
+      );
 
   Widget _sourceButton(SourceType source) => Padding(
         padding: const EdgeInsets.only(bottom: 8),
         child: SizedBox(
           width: double.infinity,
-          height: 52,
           child: OutlinedButton(
+            style: OutlinedButton.styleFrom(
+              alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+            ),
             onPressed: () {
               _source = source;
               _next();
             },
-            child: Text(source.label, style: const TextStyle(fontSize: 18)),
+            child: Row(
+              children: [
+                Expanded(child: Text(source.label)),
+                const Icon(Icons.arrow_forward,
+                    size: 18, color: AppColors.muted),
+              ],
+            ),
           ),
         ),
       );
 
-  List<Widget> _yesNo(
-          String title, bool? current, void Function(bool?) assign) =>
-      [
+  List<Widget> _yesNo(String title, void Function(bool?) assign) => [
         _prompt(title),
-        _choice('Oui', current == true, () {
-          assign(true);
-          _next();
-        }),
-        _choice('Non', current == false, () {
-          assign(false);
-          _next();
-        }),
-        _choice('Je ne sais pas', current == null && _step > 0, () {
-          assign(null);
-          _next();
-        }),
+        Row(
+          children: [
+            Expanded(
+                child: _choice('Oui', () {
+              assign(true);
+              _next();
+            })),
+            const SizedBox(width: 8),
+            Expanded(
+                child: _choice('Non', () {
+              assign(false);
+              _next();
+            })),
+          ],
+        ),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton(
+            onPressed: () {
+              assign(null);
+              _next();
+            },
+            child: const Text('Je ne sais pas'),
+          ),
+        ),
       ];
 
-  Widget _choice(String label, bool _, VoidCallback onPressed) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: SizedBox(
-          width: double.infinity,
-          height: 52,
-          child: FilledButton.tonal(
-              onPressed: onPressed,
-              child: Text(label, style: const TextStyle(fontSize: 18))),
-        ),
+  Widget _choice(String label, VoidCallback onPressed) => OutlinedButton(
+        onPressed: onPressed,
+        child: Text(label),
       );
 
   Widget _photoPage() => Padding(
@@ -203,23 +231,23 @@ class _TestFlowViewState extends State<TestFlowView> {
             const Text(
                 'Posez le gobelet sur une marque noire imprimée. Si la photo est floue, elle est écartée.'),
             const SizedBox(height: 12),
-            if (_photoNote != null)
-              Text(_photoNote!,
-                  style: const TextStyle(fontWeight: FontWeight.bold)),
+            if (_photoNote != null) ...[
+              const SizedBox(height: 16),
+              Text(_photoNote!, style: Theme.of(context).textTheme.titleMedium),
+            ],
             const Spacer(),
             SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: FilledButton(
-                    onPressed: _openCamera,
-                    child: const Text('Prendre la photo'))),
+              width: double.infinity,
+              child: FilledButton(
+                  onPressed: _openCamera,
+                  child: const Text('Prendre la photo')),
+            ),
             const SizedBox(height: 8),
             SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: OutlinedButton(
-                    onPressed: _next,
-                    child: const Text('Continuer sans photo'))),
+              width: double.infinity,
+              child: OutlinedButton(
+                  onPressed: _next, child: const Text('Continuer sans photo')),
+            ),
           ],
         ),
       );
@@ -248,8 +276,7 @@ class _TestFlowViewState extends State<TestFlowView> {
             'Photo écartée : trop floue. Reprenez-la ou continuez sans photo.';
       } else if (read.markVisible == null) {
         _markVisible = null;
-        _photoNote =
-            'Marque incertaine. Répondez vous-même : elle est ${read.contrast.toStringAsFixed(0)} de contraste.';
+        _photoNote = 'La photo ne tranche pas. Répondez aux questions.';
       } else {
         _markVisible = read.markVisible;
         _photoNote = read.markVisible!
@@ -261,31 +288,47 @@ class _TestFlowViewState extends State<TestFlowView> {
 
   Widget _resultPage() {
     final result = _result!;
-    final color = switch (result.level) {
-      RiskLevel.low => AppColors.low,
-      RiskLevel.medium => AppColors.medium,
-      RiskLevel.high => AppColors.high,
-      RiskLevel.unknown => AppColors.unknown,
-    };
+    final tone = AppColors.forRisk(result.level);
+    final text = Theme.of(context).textTheme;
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       children: [
-        Row(children: [
-          Icon(Icons.circle, color: color),
-          const SizedBox(width: 8),
-          Expanded(
-              child: Text(result.level.label,
-                  style: const TextStyle(
-                      fontSize: 24, fontWeight: FontWeight.bold))),
-        ]),
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: AppColors.surfaceFor(result.level),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(AppColors.iconFor(result.level), color: tone),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(result.level.label, style: text.titleLarge),
+                      const SizedBox(height: 4),
+                      Text(
+                          'Confiance ${(result.confidence * 100).round()} %. Indicatif, non certifié.',
+                          style: text.bodySmall),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: 24),
+        Text('POURQUOI', style: text.labelSmall),
         const SizedBox(height: 8),
-        Text(
-            'Confiance du dépistage visuel : ${(result.confidence * 100).round()} %. Indicatif, non certifié.'),
-        const SizedBox(height: 16),
-        const Text('Pourquoi', style: TextStyle(fontWeight: FontWeight.bold)),
         ...result.reasons.map((reason) => Padding(
-            padding: const EdgeInsets.only(top: 6), child: Text('• $reason'))),
-        const SizedBox(height: 16),
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Text(reason, style: text.bodyLarge),
+            )),
+        const SizedBox(height: 8),
         SwitchListTile(
           contentPadding: EdgeInsets.zero,
           title: const Text('Position précise'),
@@ -295,14 +338,26 @@ class _TestFlowViewState extends State<TestFlowView> {
           onChanged: (value) => setState(() => _exactLocation = value),
         ),
         const SizedBox(height: 8),
-        FilledButton(
-            onPressed: _saving ? null : _save,
-            child: Text(
-                _saving ? 'Enregistrement…' : 'Enregistrer sur le téléphone')),
+        SizedBox(
+          width: double.infinity,
+          child: FilledButton(
+            onPressed: () => widget.onOpenGuide?.call(result),
+            child: const Text('Voir les actions'),
+          ),
+        ),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton(
+              onPressed: _saving ? null : _save,
+              child: Text(_saving
+                  ? 'Enregistrement…'
+                  : 'Enregistrer sur le téléphone')),
+        ),
         if (_saveMessage != null)
           Padding(
               padding: const EdgeInsets.only(top: 12),
-              child: Text(_saveMessage!)),
+              child: Text(_saveMessage!, style: text.bodyMedium)),
         TextButton(onPressed: _reset, child: const Text('Nouveau dépistage')),
       ],
     );
@@ -371,13 +426,7 @@ class _CapturePageState extends State<_CapturePage> {
               ? const Center(child: CircularProgressIndicator())
               : Stack(fit: StackFit.expand, children: [
                   CameraPreview(controller),
-                  Center(
-                      child: Container(
-                          width: 180,
-                          height: 180,
-                          decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: Colors.white, width: 3)))),
+                  const Center(child: _Viewfinder(size: 180)),
                 ]),
       floatingActionButton: controller == null
           ? null
@@ -391,4 +440,48 @@ class _CapturePageState extends State<_CapturePage> {
             ),
     );
   }
+}
+
+class _Viewfinder extends StatelessWidget {
+  const _Viewfinder({required this.size});
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: Size.square(size),
+      painter: const _CornerPainter(),
+    );
+  }
+}
+
+class _CornerPainter extends CustomPainter {
+  const _CornerPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.square;
+    const arm = 28.0;
+    final path = Path()
+      ..moveTo(0, arm)
+      ..lineTo(0, 0)
+      ..lineTo(arm, 0)
+      ..moveTo(size.width - arm, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width, arm)
+      ..moveTo(size.width, size.height - arm)
+      ..lineTo(size.width, size.height)
+      ..lineTo(size.width - arm, size.height)
+      ..moveTo(arm, size.height)
+      ..lineTo(0, size.height)
+      ..lineTo(0, size.height - arm);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

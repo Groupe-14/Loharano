@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
-/// Overlay du scanner QR Code avec contrôles caméra (flash/caméra) et repère visuel.
 class ScannerOverlayWidget extends StatelessWidget {
   const ScannerOverlayWidget({
     super.key,
@@ -14,104 +13,80 @@ class ScannerOverlayWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final frame = isDetected ? const Color(0xFFD7EBE6) : Colors.white;
     return Stack(
       children: [
         Center(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 300),
-            width: 240,
-            height: 240,
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: isDetected ? Colors.greenAccent : Colors.white,
-                width: isDetected ? 4 : 3,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: (isDetected ? Colors.greenAccent : Colors.black)
-                      .withValues(alpha: 0.3),
-                  blurRadius: 12,
-                  spreadRadius: 2,
-                ),
-              ],
-            ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Icon(
-                    isDetected
-                        ? Icons.check_circle_outline
-                        : Icons.qr_code_scanner,
-                    color: (isDetected ? Colors.greenAccent : Colors.white)
-                        .withValues(alpha: 0.5),
-                    size: 64,
-                  ),
-                ),
-              ],
-            ),
+          child: CustomPaint(
+            size: const Size.square(220),
+            painter: _ScanFramePainter(color: frame),
           ),
         ),
         Positioned(
-          top: 16,
-          right: 16,
-          child: Card(
-            color: Colors.black54,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  _TorchButton(controller: controller),
-                  const SizedBox(width: 4),
-                  Semantics(
-                    label: 'Changer de caméra',
-                    button: true,
-                    child: IconButton(
-                      icon: const Icon(Icons.cameraswitch, color: Colors.white),
-                      tooltip: 'Basculer caméra',
-                      onPressed: () => controller.switchCamera(),
-                    ),
-                  ),
-                ],
+          top: 12,
+          right: 8,
+          child: Row(
+            children: [
+              _TorchButton(controller: controller),
+              IconButton(
+                tooltip: 'Basculer caméra',
+                onPressed: () => controller.switchCamera(),
+                icon: const Icon(Icons.cameraswitch, color: Colors.white),
               ),
-            ),
+            ],
           ),
         ),
-        Positioned(
-          top: 24,
+        const Positioned(
           left: 20,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-              decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.64),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.center_focus_strong,
-                      color: Colors.white, size: 16),
-                  SizedBox(width: 6),
-                  Text(
-                    'Pointez vers le QR Code',
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
+          right: 20,
+          bottom: 16,
+          child: Text(
+            'Cadrez le QR du point d’eau',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              shadows: [Shadow(blurRadius: 8, color: Colors.black54)],
             ),
           ),
         ),
       ],
     );
   }
+}
+
+class _ScanFramePainter extends CustomPainter {
+  const _ScanFramePainter({required this.color});
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..strokeWidth = 3
+      ..style = PaintingStyle.stroke
+      ..strokeCap = StrokeCap.square;
+    const arm = 32.0;
+    final path = Path()
+      ..moveTo(0, arm)
+      ..lineTo(0, 0)
+      ..lineTo(arm, 0)
+      ..moveTo(size.width - arm, 0)
+      ..lineTo(size.width, 0)
+      ..lineTo(size.width, arm)
+      ..moveTo(size.width, size.height - arm)
+      ..lineTo(size.width, size.height)
+      ..lineTo(size.width - arm, size.height)
+      ..moveTo(arm, size.height)
+      ..lineTo(0, size.height)
+      ..lineTo(0, size.height - arm);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _ScanFramePainter oldDelegate) =>
+      oldDelegate.color != color;
 }
 
 class _TorchButton extends StatefulWidget {
@@ -127,19 +102,15 @@ class _TorchButtonState extends State<_TorchButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Semantics(
-      label: 'Activer ou désactiver le flash',
-      button: true,
-      child: IconButton(
-        icon: Icon(
-          _isTorchOn ? Icons.flash_on : Icons.flash_off,
-          color: _isTorchOn ? Colors.amber : Colors.white,
-        ),
-        tooltip: 'Flash',
-        onPressed: () async {
-          await widget.controller.toggleTorch();
-          setState(() => _isTorchOn = !_isTorchOn);
-        },
+    return IconButton(
+      tooltip: 'Flash',
+      onPressed: () async {
+        await widget.controller.toggleTorch();
+        setState(() => _isTorchOn = !_isTorchOn);
+      },
+      icon: Icon(
+        _isTorchOn ? Icons.flash_on : Icons.flash_off,
+        color: _isTorchOn ? const Color(0xFFF8EDD8) : Colors.white,
       ),
     );
   }

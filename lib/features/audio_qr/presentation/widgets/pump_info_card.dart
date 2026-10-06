@@ -5,7 +5,6 @@ import '../../domain/entities/pump_data.dart';
 import 'audio_controls_widget.dart';
 import 'guided_steps_widget.dart';
 
-/// Card affichant la pompe identifiée, le moteur audio et le guidage pas-à-pas synchrone.
 class PumpInfoCard extends StatefulWidget {
   const PumpInfoCard({
     super.key,
@@ -38,11 +37,8 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
             maxHeight: mediaQuery.size.height * 0.60,
           ),
           child: Card(
-            elevation: 8,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.fromLTRB(14, 8, 8, 12),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -50,30 +46,25 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
                   children: [
                     Row(
                       children: [
-                        const CircleAvatar(
-                          radius: 16,
-                          backgroundColor: Colors.blueAccent,
-                          child: Icon(Icons.water_drop,
-                              color: Colors.white, size: 18),
-                        ),
-                        const SizedBox(width: 8),
+                        const Icon(Icons.water_drop_outlined, size: 22),
+                        const SizedBox(width: 10),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Pompe reconnue: ${widget.pump.id}',
+                                widget.pump.name,
                                 style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                '${widget.pump.name} • ${widget.pump.status}',
+                                '${widget.pump.id} · ${widget.pump.status}',
                                 style: const TextStyle(
-                                    fontSize: 11, color: Colors.black54),
+                                    fontSize: 13, color: Color(0xFF5E675F)),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -81,8 +72,6 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
                           ),
                         ),
                         IconButton(
-                          constraints: const BoxConstraints(),
-                          padding: const EdgeInsets.all(4),
                           icon: Icon(_isExpanded
                               ? Icons.keyboard_arrow_down
                               : Icons.keyboard_arrow_up),
@@ -91,9 +80,7 @@ class _PumpInfoCardState extends State<PumpInfoCard> {
                               setState(() => _isExpanded = !_isExpanded),
                         ),
                         IconButton(
-                          constraints: const BoxConstraints(),
-                          padding: const EdgeInsets.all(4),
-                          icon: const Icon(Icons.close, color: Colors.grey),
+                          icon: const Icon(Icons.close),
                           tooltip: 'Scanner à nouveau',
                           onPressed: widget.onReset,
                         ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 
 import '../../data/services/audio_engine_service.dart';
 
-/// Composant de contrôle de la lecture audio avec protection anti-overflow.
 class AudioControlsWidget extends StatelessWidget {
   const AudioControlsWidget({
     super.key,
@@ -29,11 +28,8 @@ class AudioControlsWidget extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
       decoration: BoxDecoration(
-        color: Theme.of(context)
-            .colorScheme
-            .surfaceContainerHighest
-            .withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xFFF3EFE6),
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

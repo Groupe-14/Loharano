@@ -5,7 +5,7 @@ import 'package:latlong2/latlong.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/models/measurement.dart';
 import '../../core/models/risk_level.dart';
-import '../../features/sync/sync_service.dart';
+import '../sync/sync_service.dart';
 
 class WaterMapView extends StatelessWidget {
   const WaterMapView(
@@ -27,37 +27,58 @@ class WaterMapView extends StatelessWidget {
     for (final item in measurements) {
       counts[item.riskLevel] = (counts[item.riskLevel] ?? 0) + 1;
     }
+    final total = measurements.length;
+    final text = Theme.of(context).textTheme;
     return Column(
       children: [
-        Material(
-          color: AppColors.background,
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(12, 8, 12, 4),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('${measurements.length} dépistage(s) sur ce téléphone',
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
-                Text(
-                    'Faible ${counts[RiskLevel.low]} · Moyen ${counts[RiskLevel.medium]} · Élevé ${counts[RiskLevel.high]} · Inconnu ${counts[RiskLevel.unknown]}'),
-                const Text(
-                    'Indicatif, non certifié. Les tuiles de fond demandent un passage en ligne la première fois.'),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: TextButton(
-                      onPressed: () async {
-                        final report = await onSync();
-                        if (!context.mounted) return;
-                        final message = report.skippedBecauseUnconfigured
-                            ? 'Supabase n’est pas configuré. Les mesures restent ici.'
-                            : 'Envoyées : ${report.sent}. Échecs : ${report.failed}.';
-                        ScaffoldMessenger.of(context)
-                            .showSnackBar(SnackBar(content: Text(message)));
-                      },
-                      child: const Text('Envoyer les mesures en attente')),
-                ),
-              ],
-            ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 8, 8),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      total == 1
+                          ? '1 dépistage sur ce téléphone'
+                          : '$total dépistages sur ce téléphone',
+                      style: text.titleMedium,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final report = await onSync();
+                      if (!context.mounted) return;
+                      final message = report.skippedBecauseUnconfigured
+                          ? 'Supabase n’est pas configuré. Les mesures restent ici.'
+                          : 'Envoyées : ${report.sent}. Échecs : ${report.failed}.';
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(SnackBar(content: Text(message)));
+                    },
+                    child: const Text('Envoyer'),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  _count('Faible', counts[RiskLevel.low] ?? 0, AppColors.low),
+                  _count(
+                      'Moyen', counts[RiskLevel.medium] ?? 0, AppColors.medium),
+                  _count('Élevé', counts[RiskLevel.high] ?? 0, AppColors.high),
+                  _count('Inconnu', counts[RiskLevel.unknown] ?? 0,
+                      AppColors.unknown),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                located.isEmpty
+                    ? 'Aucun point pour l’instant. Un dépistage enregistré avec la position apparaît ici. Le fond se charge une fois en ligne, puis les tuiles déjà vues restent sur le téléphone.'
+                    : 'Indicatif, non certifié. Les tuiles déjà vues restent disponibles hors ligne.',
+                style: text.bodySmall,
+              ),
+            ],
           ),
         ),
         Expanded(
@@ -80,7 +101,7 @@ class WaterMapView extends StatelessWidget {
                         message:
                             '${item.riskLevel.label}${item.isDemo ? ' · DÉMO' : ''}',
                         child: Icon(Icons.place,
-                            color: _color(item.riskLevel), size: 32),
+                            color: AppColors.forRisk(item.riskLevel), size: 32),
                       ),
                     ),
                 ],
@@ -92,10 +113,24 @@ class WaterMapView extends StatelessWidget {
     );
   }
 
-  Color _color(RiskLevel level) => switch (level) {
-        RiskLevel.low => AppColors.low,
-        RiskLevel.medium => AppColors.medium,
-        RiskLevel.high => AppColors.high,
-        RiskLevel.unknown => AppColors.unknown,
-      };
+  Widget _count(String label, int value, Color tone) {
+    return Expanded(
+      child: Row(
+        children: [
+          Container(
+            width: 8,
+            height: 8,
+            decoration: BoxDecoration(color: tone, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text('$value $label',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(fontSize: 12, color: AppColors.ink)),
+          ),
+        ],
+      ),
+    );
+  }
 }

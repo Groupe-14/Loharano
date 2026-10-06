@@ -13,18 +13,8 @@ class WaterStatusCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final background = switch (level) {
-      RiskLevel.low => AppColors.low,
-      RiskLevel.medium => AppColors.medium,
-      RiskLevel.high => AppColors.high,
-      RiskLevel.unknown => AppColors.unknown,
-    };
-    final icon = switch (level) {
-      RiskLevel.low => Icons.info_outline,
-      RiskLevel.medium => Icons.warning_amber_rounded,
-      RiskLevel.high => Icons.report_outlined,
-      RiskLevel.unknown => Icons.help_outline,
-    };
+    final text = Theme.of(context).textTheme;
+    final tone = AppColors.forRisk(level);
     final subtitle = switch (level) {
       RiskLevel.low =>
         'Ce n’est pas une garantie. En cas de doute, faites bouillir.',
@@ -33,49 +23,45 @@ class WaterStatusCard extends StatelessWidget {
       RiskLevel.unknown => 'Le dépistage ne permet pas de conclure.',
     };
 
-    return ColoredBox(
-      color: background,
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Spacer(),
-            Icon(icon, size: 96, color: Colors.white),
-            const SizedBox(height: 24),
-            Text(level.label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white)),
-            const SizedBox(height: 12),
-            Text(subtitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 18, color: Colors.white)),
-            const SizedBox(height: 16),
-            IconButton(
-              style: IconButton.styleFrom(backgroundColor: Colors.white24),
-              onPressed: onSpeak,
-              icon: const Icon(Icons.volume_up_rounded,
-                  color: Colors.white, size: 28),
-              tooltip: 'Écouter le résultat',
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 28, 20, 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(level.label, style: text.headlineSmall),
+          const SizedBox(height: 16),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceFor(level),
+              borderRadius: BorderRadius.circular(8),
             ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              height: 54,
-              child: FilledButton(
-                style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primaryBlue),
-                onPressed: onSeeSteps,
-                child: const Text('Voir les actions',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(AppColors.iconFor(level), color: tone),
+                  const SizedBox(width: 12),
+                  Expanded(child: Text(subtitle, style: text.bodyLarge)),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+          const Spacer(),
+          TextButton.icon(
+            onPressed: onSpeak,
+            icon: const Icon(Icons.volume_up_outlined),
+            label: const Text('Écouter'),
+          ),
+          const SizedBox(height: 8),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              onPressed: onSeeSteps,
+              child: const Text('Voir les actions'),
+            ),
+          ),
+        ],
       ),
     );
   }

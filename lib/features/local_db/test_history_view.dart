@@ -6,7 +6,6 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/models/measurement.dart';
-import '../../core/models/risk_level.dart';
 
 class TestHistoryView extends StatelessWidget {
   const TestHistoryView(
@@ -19,7 +18,7 @@ class TestHistoryView extends StatelessWidget {
   final Object? error;
   final bool loading;
 
-  Future<void> _export(BuildContext context) async {
+  Future<void> _export() async {
     final buffer = StringBuffer(
         'id,created_at,source,risk_level,confidence,lat,lng,precision,demo,reasons\n');
     for (final item in items) {
@@ -35,34 +34,71 @@ class TestHistoryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (loading) return const Center(child: CircularProgressIndicator());
-    if (error != null)
+    if (loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (error != null) {
       return Center(
           child: Text('Impossible de lire l’historique.\n$error',
               textAlign: TextAlign.center));
-    if (items.isEmpty)
-      return const Center(child: Text('Aucun dépistage enregistré'));
+    }
+    if (items.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.all(24),
+        child: Center(
+          child: Text(
+            'Aucun dépistage enregistré.\nFaites un test dans Tester pour le retrouver ici.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
     return Column(
       children: [
         Align(
           alignment: Alignment.centerRight,
           child: TextButton.icon(
-              onPressed: () => _export(context),
+              onPressed: _export,
               icon: const Icon(Icons.ios_share),
               label: const Text('Exporter le CSV')),
         ),
         Expanded(
-          child: ListView.builder(
+          child: ListView.separated(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
             itemCount: items.length,
+            separatorBuilder: (_, __) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final item = items[index];
-              return ListTile(
-                leading:
-                    Icon(Icons.circle, color: _color(item.riskLevel), size: 16),
-                title: Text(item.riskLevel.label),
-                subtitle: Text(
-                    '${item.createdAt.toLocal()} · ${item.sourceType.label}${item.isDemo ? ' · DÉMO' : ''}'),
-                trailing: Text('${(item.confidence * 100).round()} %'),
+              final tone = AppColors.forRisk(item.riskLevel);
+              return DecoratedBox(
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.line),
+                ),
+                child: IntrinsicHeight(
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 4,
+                        decoration: BoxDecoration(
+                          color: tone,
+                          borderRadius: const BorderRadius.horizontal(
+                              left: Radius.circular(8)),
+                        ),
+                      ),
+                      Expanded(
+                        child: ListTile(
+                          title: Text(item.riskLevel.label),
+                          subtitle: Text(
+                              '${_when(item.createdAt)} · ${item.sourceType.label}${item.isDemo ? ' · DÉMO' : ''}'),
+                          trailing:
+                              Text('${(item.confidence * 100).round()} %'),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               );
             },
           ),
@@ -71,10 +107,9 @@ class TestHistoryView extends StatelessWidget {
     );
   }
 
-  Color _color(RiskLevel level) => switch (level) {
-        RiskLevel.low => AppColors.low,
-        RiskLevel.medium => AppColors.medium,
-        RiskLevel.high => AppColors.high,
-        RiskLevel.unknown => AppColors.unknown,
-      };
+  String _when(DateTime value) {
+    final local = value.toLocal();
+    String two(int n) => n.toString().padLeft(2, '0');
+    return '${two(local.day)}.${two(local.month)}.${local.year}  ${two(local.hour)}:${two(local.minute)}';
+  }
 }

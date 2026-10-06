@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import 'core/audio/speech.dart';
-import 'core/constants/app_colors.dart';
 import 'core/db/local_database.dart';
+import 'core/theme/app_theme.dart';
 import 'core/models/measurement.dart';
 import 'core/risk/risk_result.dart';
 import 'features/audio_qr/presentation/qr_scanner_view.dart';
@@ -23,14 +23,15 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   final _speech = Speech();
   final _sync = SyncService();
-  final _titles = const [
+  static const _sections = [
     'Tester',
     'Purifier',
     'Carte',
     'Historique',
-    'Scanner'
+    'Scanner',
   ];
   var _index = 0;
+  var _stepsRequest = 0;
   var _loading = true;
   Object? _error;
   List<Measurement> _items = [];
@@ -61,6 +62,40 @@ class _AppState extends State<App> {
     }
   }
 
+  Widget _body() {
+    if (_index == 4) return const QrScannerView();
+    final map = _index == 2
+        ? WaterMapView(
+            measurements: _items,
+            onSync: () async {
+              final report = await _sync.pushPending();
+              await _reload();
+              return report;
+            })
+        : const SizedBox.shrink();
+    return IndexedStack(
+      index: _index,
+      children: [
+        TestFlowView(onSaved: _save, onOpenGuide: _openGuide),
+        PurificationGuideView(
+            result: _lastResult,
+            stepsRequest: _stepsRequest,
+            onSpeak: _speech.speak,
+            onFinish: () => setState(() => _index = 0)),
+        map,
+        TestHistoryView(items: _items, error: _error, loading: _loading),
+      ],
+    );
+  }
+
+  void _openGuide(RiskResult result) {
+    setState(() {
+      _lastResult = result;
+      _stepsRequest += 1;
+      _index = 1;
+    });
+  }
+
   Future<void> _save(Measurement measurement) async {
     await LocalDatabase.instance.insertMeasurement(measurement);
     setState(() => _lastResult = measurement.toResult());
@@ -71,37 +106,14 @@ class _AppState extends State<App> {
   Widget build(BuildContext context) => MaterialApp(
         title: 'Loharano',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryBlue),
-            scaffoldBackgroundColor: AppColors.background,
-            useMaterial3: true),
+        theme: AppTheme.light,
         home: Scaffold(
-          appBar: AppBar(
-              title: Text('Loharano · ${_titles[_index]}'),
-              actions: const [OfflineBadgeWidget(), SizedBox(width: 8)]),
-          body: _index == 4
-              ? const QrScannerView()
-              : IndexedStack(
-                  index: _index,
-                  children: [
-                    TestFlowView(onSaved: _save, onSpeak: _speech.speak),
-                    PurificationGuideView(
-                        result: _lastResult,
-                        onSpeak: _speech.speak,
-                        onFinish: () => setState(() => _index = 0)),
-                    _index == 2
-                        ? WaterMapView(
-                            measurements: _items,
-                            onSync: () async {
-                              final report = await _sync.pushPending();
-                              await _reload();
-                              return report;
-                            })
-                        : const SizedBox.shrink(),
-                    TestHistoryView(
-                        items: _items, error: _error, loading: _loading),
-                  ],
-                ),
+          appBar: _index == 4
+              ? null
+              : AppBar(
+                  title: Text('Loharano · ${_sections[_index]}'),
+                  actions: const [OfflineBadgeWidget(), SizedBox(width: 12)]),
+          body: _body(),
           bottomNavigationBar: NavigationBar(
             selectedIndex: _index,
             onDestinationSelected: (value) => setState(() => _index = value),

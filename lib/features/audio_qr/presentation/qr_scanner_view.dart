@@ -68,11 +68,13 @@ class _QrScannerViewState extends State<QrScannerView> {
         ],
       ),
     );
+    nameController.dispose();
     if (name == null || name.isEmpty || !mounted) return;
     try {
       var permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied)
+      if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
+      }
       final position = await Geolocator.getCurrentPosition();
       await LocalDatabase.instance.insertWaterPoint(WaterPoint(
           id: code,
@@ -109,19 +111,14 @@ class _QrScannerViewState extends State<QrScannerView> {
   Widget build(BuildContext context) => Scaffold(
         body: Stack(
           children: [
-            // Scanner QR Code physique
             MobileScanner(
               controller: _scanner,
               onDetect: _onDetect,
             ),
-
-            // Cadre de cadrage visuel et contrôles matériels
             ScannerOverlayWidget(
               controller: _scanner,
               isDetected: _pumpId != null,
             ),
-
-            // Panneau inférieur d'information et guidage audio synchronisé
             if (_pumpId != null && _currentPump != null)
               PumpInfoCard(
                 pump: _currentPump!,
@@ -131,22 +128,38 @@ class _QrScannerViewState extends State<QrScannerView> {
             if (_pumpId != null && _currentPump == null)
               Align(
                 alignment: Alignment.bottomCenter,
-                child: Card(
-                  margin: const EdgeInsets.all(16),
+                child: SafeArea(
                   child: Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                            'Point d’eau non reconnu. Aucune fiche n’est inventée pour ce code.'),
-                        TextButton(
-                            onPressed: _saveUnknownPoint,
-                            child: const Text('Enregistrer ce point ici')),
-                        TextButton(
-                            onPressed: _resetScanner,
-                            child: const Text('Fermer')),
-                      ],
+                    padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                    child: Material(
+                      color: const Color(0xFFFFFCF7),
+                      borderRadius: BorderRadius.circular(10),
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('Code inconnu',
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w600)),
+                            const SizedBox(height: 4),
+                            const Text(
+                                'Ce code n’est pas dans les fiches de démonstration.'),
+                            Row(
+                              children: [
+                                TextButton(
+                                    onPressed: _resetScanner,
+                                    child: const Text('Fermer')),
+                                const Spacer(),
+                                FilledButton(
+                                    onPressed: _saveUnknownPoint,
+                                    child: const Text('Enregistrer ici')),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),

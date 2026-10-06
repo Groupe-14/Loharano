@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../data/services/audio_engine_service.dart';
 import '../../domain/entities/pump_data.dart';
 
-/// Affichage synchrone des étapes de guidage visuel en correlation avec le moteur audio.
 class GuidedStepsWidget extends StatelessWidget {
   const GuidedStepsWidget({
     super.key,
@@ -21,29 +20,12 @@ class GuidedStepsWidget extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            const Text(
-              'Instructions pas-à-pas :',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primaryContainer,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                'Étape ${activeIndex + 1} / ${steps.length}',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onPrimaryContainer,
-                ),
-              ),
-            ),
-          ],
+        Text(
+          'Étape ${activeIndex + 1} sur ${steps.length}',
+          style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: Color(0xFF5E675F)),
         ),
         const SizedBox(height: 8),
         ListView.separated(
@@ -67,31 +49,23 @@ class GuidedStepsWidget extends StatelessWidget {
                   padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isActive
-                        ? Theme.of(context)
-                            .colorScheme
-                            .primary
-                            .withValues(alpha: 0.12)
-                        : Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.circular(10),
+                        ? const Color(0xFFD7EBE6)
+                        : const Color(0xFFFFFCF7),
+                    borderRadius: BorderRadius.circular(8),
                     border: Border.all(
                       color: isActive
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.grey.shade300,
-                      width: isActive ? 2 : 1,
+                          ? const Color(0xFF0F5C56)
+                          : const Color(0xFFDDD4C4),
                     ),
                   ),
                   child: Row(
                     children: [
-                      CircleAvatar(
-                        radius: 16,
-                        backgroundColor: isActive
-                            ? Theme.of(context).colorScheme.primary
-                            : Colors.grey.shade300,
-                        child: Icon(
-                          step.icon,
-                          size: 18,
-                          color: isActive ? Colors.white : Colors.black87,
-                        ),
+                      Icon(
+                        step.icon,
+                        size: 20,
+                        color: isActive
+                            ? const Color(0xFF0F5C56)
+                            : const Color(0xFF5E675F),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -127,7 +101,7 @@ class GuidedStepsWidget extends StatelessWidget {
                           padding: EdgeInsets.only(left: 6),
                           child: Icon(
                             Icons.volume_up,
-                            color: Colors.blue,
+                            color: Color(0xFF0F5C56),
                             size: 20,
                           ),
                         ),
