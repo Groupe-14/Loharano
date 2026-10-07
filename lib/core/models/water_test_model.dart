@@ -8,6 +8,8 @@ class WaterTestModel {
     required this.turbidityScore,
     this.imagePath,
     this.qrCodeId,
+    this.latitude,
+    this.longitude,
     this.isSynced = false,
   });
 
@@ -17,6 +19,8 @@ class WaterTestModel {
   final double turbidityScore;
   final String? imagePath;
   final String? qrCodeId;
+  final double? latitude;
+  final double? longitude;
   final bool isSynced;
 
   Map<String, Object?> toMap() => {
@@ -26,6 +30,8 @@ class WaterTestModel {
         'turbidity_score': turbidityScore,
         'image_path': imagePath,
         'qr_code_id': qrCodeId,
+        'latitude': latitude,
+        'longitude': longitude,
         'is_synced': isSynced ? 1 : 0,
       };
 
@@ -37,6 +43,8 @@ class WaterTestModel {
       turbidityScore: (map['turbidity_score'] as num).toDouble(),
       imagePath: map['image_path'] as String?,
       qrCodeId: map['qr_code_id'] as String?,
+      latitude: (map['latitude'] as num?)?.toDouble(),
+      longitude: (map['longitude'] as num?)?.toDouble(),
       isSynced: (map['is_synced'] as int? ?? 0) == 1,
     );
   }
