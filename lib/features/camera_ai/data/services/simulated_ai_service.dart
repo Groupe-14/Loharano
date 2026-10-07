@@ -1,14 +1,16 @@
 import '../../domain/entities/water_diagnostic.dart';
 
-/// Small on-device ML stand-in used until the production model is integrated.
+/// Service de simulation utilisé en mode démo ou lorsque l'algorithme
+/// principal n'est pas disponible.
+///
+/// Produit des résultats déterministes et cohérents avec l'interface
+/// [WaterDiagnostic] enrichie (phValue, chlorineLevel, confidence).
 class SimulatedAiService {
   const SimulatedAiService();
 
   Future<WaterDiagnostic> analyze({Object? imageData}) async {
     await Future<void>.delayed(const Duration(milliseconds: 850));
-
-    // A deterministic value keeps the demo predictable while still modelling
-    // an asynchronous image-analysis operation.
+    // Score légèrement variable selon la présence ou non d'imageData.
     final score = imageData == null ? 0.24 : 0.34;
     return _diagnosticForScore(score);
   }
@@ -25,32 +27,23 @@ class SimulatedAiService {
   WaterDiagnostic _diagnosticForScore(double score) {
     final status = switch (score) {
       < 0.35 => WaterDiagnosticStatus.safe,
-      < 0.7 => WaterDiagnosticStatus.warning,
+      < 0.70 => WaterDiagnosticStatus.warning,
       _ => WaterDiagnosticStatus.danger,
     };
 
-    return WaterDiagnostic(
+    // Paramètres physico-chimiques simulés cohérents avec le statut
+    final (ph, chlorine) = switch (status) {
+      WaterDiagnosticStatus.safe => (7.2, 0.8),
+      WaterDiagnosticStatus.warning => (6.1, 2.4),
+      WaterDiagnosticStatus.danger => (4.8, 5.5),
+    };
+
+    return WaterDiagnostic.fromModelScores(
       status: status,
       turbidityScore: score,
-      colorHex: switch (status) {
-        WaterDiagnosticStatus.safe => '#18864B',
-        WaterDiagnosticStatus.warning => '#F0A202',
-        WaterDiagnosticStatus.danger => '#D64545',
-      },
-      timestamp: DateTime.now(),
-      recommendations: switch (status) {
-        WaterDiagnosticStatus.safe => [
-            'L’eau semble claire. Conservez-la dans un récipient propre.'
-          ],
-        WaterDiagnosticStatus.warning => [
-            'Filtrez l’eau avant consommation.',
-            'Contrôlez à nouveau après purification.'
-          ],
-        WaterDiagnosticStatus.danger => [
-            'Ne buvez pas cette eau.',
-            'Faites-la bouillir ou utilisez une méthode de purification adaptée.'
-          ],
-      },
+      confidence: 0.72,
+      phValue: ph,
+      chlorineLevel: chlorine,
     );
   }
 }

@@ -18,7 +18,7 @@ void main() {
   testWidgets('HydroCheck Offline shell renders', (WidgetTester tester) async {
     await tester.pumpWidget(const App());
 
-    expect(find.textContaining('HydroCheck Offline'), findsOneWidget);
+    expect(find.textContaining('HydroCheck AI'), findsOneWidget);
     expect(find.text('Analyse'), findsWidgets);
   });
 }

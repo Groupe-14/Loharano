@@ -12,7 +12,7 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'HydroCheck Offline',
+        title: 'HydroCheck AI',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primaryBlue), scaffoldBackgroundColor: AppColors.background, useMaterial3: true),
         home: const _HydroShell(),
@@ -33,8 +33,25 @@ class _HydroShellState extends State<_HydroShell> {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text('HydroCheck Offline · ${_titles[_index]}'), actions: const [OfflineBadgeWidget(), SizedBox(width: 8)]),
-        body: IndexedStack(index: _index, children: _views),
+        appBar: AppBar(
+          title: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset(
+                  'assets/image/Logo.jpeg', 
+                  height: 32,
+                  colorBlendMode: BlendMode.multiply, // Rend le fond blanc transparent !
+                  color: Colors.white, // Nécessaire pour que le multiply s'applique au fond blanc
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text('HydrocheckAI · ${_titles[_index]}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ],
+          ),
+          actions: const [OfflineBadgeWidget(), SizedBox(width: 8)],
+        ),
+        body: _views[_index],
         bottomNavigationBar: NavigationBar(
           selectedIndex: _index,
           onDestinationSelected: (value) => setState(() => _index = value),
