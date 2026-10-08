@@ -65,6 +65,10 @@ class TfliteAiService {
       status: status,
       turbidityScore: turbidityScore,
       confidence: probabilities[classIndex].clamp(0.0, 1.0),
+      // TFLite ne produit pas directement pH/chlore.
+      // Ces valeurs seront null ; l'UI masquera les jauges correspondantes.
+      phValue: null,
+      chlorineLevel: null,
     );
   }
 

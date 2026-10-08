@@ -181,6 +181,7 @@ class _TestTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListTile(
+        onTap: onShare, // Permet d'afficher le QR Code en cliquant n'importe où sur la ligne
         leading: CircleAvatar(
           backgroundColor: _color(test.status),
           child: Icon(_icon(test.status), color: Colors.white),

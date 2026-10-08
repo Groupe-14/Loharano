@@ -134,15 +134,43 @@ class _PurificationGuideViewState extends State<PurificationGuideView> {
 
   @override
   Widget build(BuildContext context) {
+    // Si aucun test n'a été passé à la vue (via l'onglet), on invite l'utilisateur à faire une analyse
+    if (widget.waterTest == null) {
+      return Scaffold(
+        backgroundColor: const Color(0xFFE8F5E9),
+        appBar: AppBar(title: const Text('Guide de purification')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.science_outlined, size: 80, color: Colors.grey.shade400),
+                const SizedBox(height: 24),
+                const Text('Aucune analyse en cours', 
+                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
+                const SizedBox(height: 16),
+                const Text('Allez dans l\'onglet "Analyse" pour capturer ou importer une image d\'eau. Les conseils de purification s\'afficheront ici selon les résultats.', 
+                  textAlign: TextAlign.center, 
+                  style: TextStyle(fontSize: 16, color: Colors.black54, height: 1.5)),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     // 1. Affichage de la carte de statut colorée (Rouge, Orange ou Vert)
     if (!_showSteps) {
-      return WaterStatusCard(
-        status: _currentStatus,
-        onSeeSolutions: () {
-          setState(() {
-            _showSteps = true;
-          });
-        },
+      return Scaffold(
+        body: WaterStatusCard(
+          status: _currentStatus,
+          onSeeSolutions: () {
+            setState(() {
+              _showSteps = true;
+            });
+          },
+        ),
       );
     }
 

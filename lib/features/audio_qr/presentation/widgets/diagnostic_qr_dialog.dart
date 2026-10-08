@@ -13,14 +13,24 @@ Future<void> showDiagnosticQrDialog(
     context: context,
     builder: (context) => AlertDialog(
       title: const Text('Partager le diagnostic'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          QrImageView(data: payload, size: 220),
-          const SizedBox(height: 8),
-          const Text('Scannez ce code hors-ligne avec un autre téléphone.'),
-          SelectableText(payload, maxLines: 2),
-        ],
+      content: SizedBox(
+        width: 320,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox.square(
+              dimension: 220,
+              child: QrImageView(data: payload),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Scannez ce code hors-ligne avec un autre téléphone.',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            SelectableText(payload, maxLines: 2, style: const TextStyle(fontSize: 10, color: Colors.grey)),
+          ],
+        ),
       ),
       actions: [
         TextButton(
