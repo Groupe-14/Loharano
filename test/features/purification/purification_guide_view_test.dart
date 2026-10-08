@@ -19,8 +19,8 @@ void main() {
 
       // 2. Vérifier que la carte de statut est présente
       expect(find.byType(WaterStatusCard), findsOneWidget);
-      expect(find.text('Eau Trouble — Filtrer'), findsOneWidget);
-      expect(find.text('Voir la méthode de filtration'), findsOneWidget);
+      expect(find.text('Eau Saine'), findsOneWidget);
+      expect(find.byType(ElevatedButton), findsOneWidget);
     });
 
     testWidgets(
@@ -34,14 +34,14 @@ void main() {
         ),
       );
 
-      // Click sur "Voir la méthode de filtration"
-      await tester.tap(find.text('Voir la méthode de filtration'));
+      // La carte expose un unique bouton d'action pour ouvrir les étapes.
+      await tester.tap(find.byType(ElevatedButton));
       await tester.pumpAndSettle(); // Attendre l'animation / le setState
 
       // Vérifier que la liste des consignes s'affiche
       expect(find.text('Étapes à suivre'), findsOneWidget);
       expect(find.byType(StepItemCard), findsNWidgets(3));
-      expect(find.text('1. Bouteille'), findsOneWidget);
+      expect(find.text('1. Couvrir'), findsOneWidget);
       expect(find.text('Terminer / Nouvel essai'), findsOneWidget);
     });
   });
