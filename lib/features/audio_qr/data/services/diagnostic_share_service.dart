@@ -19,7 +19,6 @@ class DiagnosticShareService {
       'status': test.status.name,
     });
     final compressed = GZipEncoder().encode(utf8.encode(json));
-    if (compressed == null) return 'error_encoding';
     return base64UrlEncode(Uint8List.fromList(compressed));
   }
 }
